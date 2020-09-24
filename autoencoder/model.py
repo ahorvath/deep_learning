@@ -11,11 +11,12 @@ def create_model(n_motif, motif_len, seq_length, batch_size, X_train, X_valid):
     input_img = Input(shape=(seq_length, 4))  # adapt this if using `channels_first` image data format
     print(input_img)
     print(n_motif)
+    print("motif_len")
     print(motif_len)
     x = Conv1D(filters=n_motif, kernel_size=motif_len, strides=1, activation='relu', padding='same', name = "first_enc_conv")(input_img)
-    x = MaxPooling1D(pool_size=int(motif_len/2),strides=1)(x)
-    x = Conv1D(filters=int(n_motif/2), kernel_size=motif_len, strides=1, activation='relu', padding='same', name = "second_enc_conv")(x)
+#    x = MaxPooling1D(pool_size=motif_len,strides=motif_len)(x)
     shape_before_flattening = K.int_shape(x)
+    print("shape")
     print(shape_before_flattening[1:])
     x = Flatten()(x)
     encoded = Dense(5, activation='relu', name='encoded')(x)
@@ -25,9 +26,7 @@ def create_model(n_motif, motif_len, seq_length, batch_size, X_train, X_valid):
     # Reshape into an image of the same shape as before our last `Flatten` layer
     x = Reshape(shape_before_flattening[1:])(x)
 
-    # at this point the representation is (7, 7, 32)
-    x = Conv1D(filters=int(n_motif/2), kernel_size=motif_len, strides=1, activation='relu', padding='same', name = "first_dec_conv")(x)
-    x = Conv1D(filters=n_motif-1, kernel_size=motif_len-1, strides=1, activation='relu', padding='same', name = "second_dec_conv")(x)
+    x = Conv1D(filters=n_motif, kernel_size=motif_len-1, strides=1, activation='relu', padding='same', name = "second_dec_conv")(x)
     decoded = Conv1D(filters=4, kernel_size=motif_len, activation='sigmoid', padding='same', name = "final_dec_conv")(x)
     print(decoded)
     autoencoder = Model(input_img, decoded)

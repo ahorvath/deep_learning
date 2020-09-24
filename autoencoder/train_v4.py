@@ -50,33 +50,5 @@ model = create_model(n_motif, motif_len, seq_length, batch_size, X_train,X_valid
 
 t_results = model.evaluate(X_test, X_test, batch_size=batch_size, verbose=1)
 print(t_results)
-predicted_classes = model.predict_classes(X_test)
-conv_layer = model.layers[0]
-conv_output = conv_layer.get_output_at(0)
-conv1d_f_max = K.function([model.input], [K.argmax(conv_output, axis=1), K.max(conv_output, axis=1)])
-
-f = open('params.pkl', 'wb')
-pickle.dump([input_seq, X_train, X_test, X_valid, y_train, y_test, y_valid, train_indices, test_indices, valid_indices, model], f)
-f.close()
-
-y_test_pos = y_test.sum(axis=1) > 0
-X_test_pos = X_test[y_test_pos]
-y_train_pos = y_train.sum(axis=1) > 0
-print( y_train.sum(axis=1))
-X_train_pos = X_train[y_train_pos]
-
-matrix = confusion_matrix(y_test, predicted_classes)
-print(matrix)
-make_logos(n_motif, motif_len, X_train_pos, batch_size = 1, f = conv1d_f_max, name = "motifs")
-input_seq[test_indices][y_test_pos]
-
-TP_indices = ((y_test & predicted_classes) == 1).flatten()
-TN_indices = ((np.logical_not(y_test) & np.logical_not(predicted_classes)) == 1).flatten()
-FP_indices = ((np.logical_not(y_test) & predicted_classes) == 1).flatten()
-FN_indices = ((y_test & np.logical_not(predicted_classes)) == 1).flatten()
-
-input_seq[test_indices][TP_indices]; input_seq[test_indices][TN_indices]; input_seq[test_indices][FN_indices]; input_seq[test_indices][FP_indices]
-print(len(input_seq[test_indices][TP_indices]))
-print(len(input_seq[test_indices][TN_indices]))
-#print(input_seq[test_indices][FN_indices])
-#print(input_seq[test_indices][FP_indices])
+predicted = model.predict(X_test)
+print(predicted)
